@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instruction Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hind+Vadodara:wght@400;500;600;700&family=Noto+Sans+Gujarati:wght@400;500;600;700&family=Noto+Serif+Gujarati:wght@400;500;600;700&family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-1: #1B1035;
+    --bg-2: #3A1258;
+    --panel: #2A1750;
+    --panel-2: #37206A;
+    --pink: #FF5C8A;
+    --teal: #21E6C1;
+    --yellow: #FFD23F;
+    --text: #FFF7FB;
+    --text-dim: #C6B4E8;
+    --line: #4B2C7A;
+    --danger: #FF7A6E;
+    --ok: #21E6C1;
+  }
+  *{box-sizing:border-box;}
+  html,body{min-height:100%;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 500px at 12% 0%, rgba(255,92,138,0.20), transparent 60%),
+      radial-gradient(900px 600px at 88% 8%, rgba(33,230,193,0.16), transparent 55%),
+      linear-gradient(160deg, var(--bg-1) 0%, var(--bg-2) 100%);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    display:flex; align-items:flex-start; justify-content:center;
+    min-height:100vh; padding:24px;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  .gu{ font-family:'Hind Vadodara','Inter',sans-serif; }
+  .stage{ width:100%; max-width:520px; margin:auto; }
+  .stage.wide{ max-width:680px; }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    position:relative; overflow:hidden;
+    box-shadow:0 30px 70px -25px rgba(58,18,88,0.75);
+  }
+  .card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:5px;
+    background:linear-gradient(90deg, var(--pink), var(--yellow), var(--teal));
+  }
+  .card-inner{ padding:40px 32px 32px; }
+
+  .badge-mark{
+    width:46px;height:46px; border-radius:13px;
+    background:linear-gradient(135deg, var(--pink), #B24BFF);
+    display:flex;align-items:center;justify-content:center; color:#fff;
+    font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; margin-bottom:22px;
+    box-shadow:0 8px 20px -6px rgba(255,92,138,0.6);
+  }
+  h1{ font-family:'Baloo 2',sans-serif; font-size:24px; font-weight:700; margin:0 0 8px; line-height:1.3; letter-spacing:0.2px; }
+  .sub{ color:var(--text-dim); font-size:14.5px; line-height:1.7; margin:0 0 24px; }
+  label{ display:block; font-size:13px; color:var(--text-dim); margin-bottom:8px; font-weight:500; }
+  .field{ margin-bottom:16px; }
+  input[type=text], input[type=email], input[type=password], textarea{
+    width:100%; background:var(--panel-2); border:1.5px solid var(--line); border-radius:10px;
+    padding:13px 14px; font-size:15px; color:var(--text); font-family:'Inter',sans-serif;
+    outline:none; transition:border-color .15s ease, box-shadow .15s ease; resize:vertical;
+  }
+  input:focus, textarea:focus{ border-color:var(--teal); box-shadow:0 0 0 3px rgba(33,230,193,0.18); }
+  .err{ color:var(--danger); font-size:13px; margin-top:8px; min-height:18px; font-weight:500; }
+  .ok-msg{ color:var(--ok); font-size:13px; margin-top:8px; min-height:18px; font-weight:500; }
+  .note-box{
+    background:rgba(255,210,63,0.08); border:1px solid rgba(255,210,63,0.35); border-radius:10px;
+    padding:12px 14px; font-size:13px; color:var(--text-dim); line-height:1.6; margin-bottom:18px;
+  }
+  .note-box b{ color:var(--yellow); }
+  button{ font-family:'Inter',sans-serif; cursor:pointer; border:none; }
+  .btn-primary{
+    margin-top:6px; width:100%; background:linear-gradient(120deg, var(--pink), #B24BFF); color:#fff; font-weight:700;
+    font-size:15.5px; padding:15px; border-radius:10px; transition:filter .15s ease, transform .1s ease;
+    box-shadow:0 12px 24px -10px rgba(255,92,138,0.55);
+  }
+  .btn-primary:hover{ filter:brightness(1.08); }
+  .btn-primary:active{ transform:scale(0.99); }
+  .btn-primary:disabled{ opacity:0.5; cursor:default; }
+
+  .text-link{
+    background:none; color:var(--text-dim); font-size:13px; font-family:'Inter',sans-serif;
+    text-decoration:underline; text-underline-offset:3px; padding:0; font-weight:500;
+  }
+  .text-link:hover{ color:var(--teal); }
+  .text-link.active{ color:var(--pink); }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; padding:20px 32px 0; gap:12px; }
+  .who{ font-size:13px; color:var(--text-dim); }
+  .who span{ color:var(--text); font-weight:600; }
+  .topbar-actions{ display:flex; gap:16px; flex-shrink:0; }
+
+  .step-num{
+    font-family:'Baloo 2',sans-serif; font-size:56px; font-weight:700; line-height:1; margin:26px 0 18px;
+    background:linear-gradient(120deg, var(--pink), var(--yellow));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .step-text{ font-size:19px; line-height:1.85; color:var(--text); min-height:120px; }
+
+  .dots{ display:flex; gap:7px; padding:0 32px; margin-top:8px; }
+  .dot{ height:5px; flex:1; background:var(--line); border-radius:3px; overflow:hidden; }
+  .dot.done{ background:var(--teal); }
+  .dot.active{ background:var(--pink); }
+
+  .navrow{ display:flex; gap:12px; padding:26px 32px 32px; }
+  .btn-ghost{
+    flex:1; background:transparent; border:1.5px solid var(--line); color:var(--text);
+    font-size:15px; font-weight:600; padding:13px; border-radius:10px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .btn-ghost:hover{ border-color:var(--teal); background:var(--panel-2); }
+  .btn-ghost:disabled{ opacity:0.35; cursor:default; }
+  .btn-next{
+    flex:2; background:linear-gradient(120deg, var(--pink), #B24BFF); color:#fff; font-weight:700; font-size:15px;
+    padding:13px; border-radius:10px; box-shadow:0 12px 22px -10px rgba(255,92,138,0.55);
+  }
+  .btn-next:hover{ filter:brightness(1.08); }
+  .btn-next:disabled{ opacity:0.4; cursor:default; }
+
+  .done-row{ display:flex; gap:12px; margin-top:22px; }
+  .btn-teal{
+    flex:1; background:linear-gradient(120deg, var(--teal), #17B8A6); color:#0C2622; font-weight:700; font-size:15px;
+    padding:14px; border-radius:10px; box-shadow:0 12px 22px -10px rgba(33,230,193,0.45);
+    transition:filter .15s ease, transform .1s ease;
+  }
+  .btn-teal:hover{ filter:brightness(1.06); }
+  .btn-teal:active{ transform:scale(0.99); }
+
+  .done-icon{
+    width:54px;height:54px; border-radius:15px;
+    background:linear-gradient(135deg, var(--teal), #17B8A6);
+    display:flex;align-items:center;justify-content:center; margin-bottom:20px;
+    box-shadow:0 10px 22px -8px rgba(33,230,193,0.5);
+  }
+  .done-icon svg{ width:24px; height:24px; }
+
+  .hidden{ display:none !important; }
+
+  .tabs{ display:flex; gap:22px; padding:0 32px; border-bottom:1.5px solid var(--line); }
+  .tab-btn{
+    background:none; color:var(--text-dim); font-size:14px; font-weight:600;
+    padding:14px 2px; border-bottom:2.5px solid transparent; margin-bottom:-2px;
+  }
+  .tab-btn.active{ color:var(--text); border-bottom-color:var(--teal); }
+
+  .admin-item{ border:1.5px solid var(--line); border-radius:12px; padding:14px 16px; margin-bottom:12px; background:var(--panel-2); }
+  .admin-item-top{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+  .admin-item-num{ font-family:'Baloo 2',sans-serif; font-size:14px; color:var(--yellow); font-weight:700; padding-top:9px; min-width:22px; }
+  .admin-item-body{ flex:1; min-width:0; }
+  .admin-item-actions{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .mini-btn{
+    background:transparent; border:1.5px solid var(--line); color:var(--text-dim);
+    font-size:12.5px; padding:7px 11px; border-radius:8px; font-weight:600;
+    transition:border-color .15s ease, color .15s ease;
+  }
+  .mini-btn:hover{ border-color:var(--teal); color:var(--text); }
+  .mini-btn.danger:hover{ border-color:var(--danger); color:var(--danger); }
+  .mini-btn:disabled{ opacity:0.3; }
+
+  .add-block{ border:1.5px dashed var(--line); border-radius:12px; padding:16px; margin-top:6px; }
+  .add-block label{ margin-bottom:8px; }
+  .add-row{ display:flex; gap:10px; margin-top:10px; }
+
+  .toolbar{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:8px; }
+  .tbtn{
+    background:var(--panel); border:1.5px solid var(--line); color:var(--text-dim);
+    width:30px; height:30px; border-radius:7px; font-size:13px; font-weight:700;
+    display:flex; align-items:center; justify-content:center; transition:border-color .15s ease, color .15s ease;
+  }
+  .tbtn:hover{ border-color:var(--teal); color:var(--text); }
+  .tbtn.u{ text-decoration:underline; }
+  .tsel{
+    background:var(--panel); border:1.5px solid var(--line); color:var(--text);
+    font-size:12.5px; padding:6px 8px; border-radius:7px; font-family:'Inter',sans-serif;
+  }
+  .tcolor{
+    width:30px; height:30px; padding:2px; border-radius:7px; border:1.5px solid var(--line);
+    background:var(--panel); cursor:pointer;
+  }
+  .rich-edit{
+    width:100%; min-height:64px; background:var(--panel); border:1.5px solid var(--line); border-radius:10px;
+    padding:12px 13px; font-size:15px; line-height:1.6; color:var(--text); outline:none;
+    transition:border-color .15s ease, box-shadow .15s ease;
+  }
+  .rich-edit:focus{ border-color:var(--teal); box-shadow:0 0 0 3px rgba(33,230,193,0.18); }
+  .rich-edit b, .rich-edit strong{ font-weight:700; }
+  .rich-edit u{ text-decoration:underline; }
+
+  .log-summary{ font-size:13px; color:var(--text-dim); margin-bottom:16px; }
+  .log-summary span{ color:var(--teal); font-weight:700; }
+  .log-row{
+    display:grid; grid-template-columns: 1.3fr 0.9fr 1.4fr 1fr; gap:10px;
+    padding:11px 0; border-bottom:1px solid var(--line); font-size:13px; align-items:center;
+  }
+  .log-row.head{ color:var(--text-dim); font-weight:700; font-size:12px; border-bottom:1.5px solid var(--pink); }
+  .log-row div{ overflow-wrap:anywhere; }
+  .log-empty{ color:var(--text-dim); font-size:14px; padding:20px 0; text-align:center; }
+
+  @media (max-width:480px){
+    .card-inner, .topbar, .navrow, .dots, .tabs{ padding-left:22px; padding-right:22px; }
+    .step-num{ font-size:44px; }
+    .step-text{ font-size:18px; }
+    .log-row{ grid-template-columns: 1fr 1fr; row-gap:4px; }
+    .done-row{ flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+  <!-- LOGIN -->
+  <div class="card" id="loginScreen">
+    <div class="card-inner">
+      <div class="badge-mark">SI</div>
+      <h1>Instruction Portal</h1>
+      <p class="sub">Enter your details to continue. All instructions will be shown one at a time.</p>
+
+      <div class="field">
+        <label for="nameInput">Full Name</label>
+        <input type="text" id="nameInput" placeholder="Your name" autocomplete="name">
+      </div>
+      <div class="field">
+        <label for="mhtInput">Mht ID</label>
+        <input type="text" id="mhtInput" placeholder="Your Mht ID">
+      </div>
+      <div class="field">
+        <label for="emailInput">Email Address</label>
+        <input type="email" id="emailInput" placeholder="you@example.com" autocomplete="email">
+      </div>
+
+      <div class="err" id="errMsg"></div>
+      <button class="btn-primary" onclick="tryLogin()">Continue</button>
+      <div style="text-align:center; margin-top:18px;">
+        <button class="text-link" onclick="showAdminGate()">Admin Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN GATE -->
+  <div class="card hidden" id="adminGateScreen">
+    <div class="card-inner">
+      <div class="badge-mark">A</div>
+      <h1>Admin Access</h1>
+      <p class="sub">Enter the passcode to manage instructions and view recent activity.</p>
+      <div class="field">
+        <label for="adminPass">Passcode</label>
+        <input type="password" id="adminPass" placeholder="••••••••">
+      </div>
+      <div class="err" id="adminErr"></div>
+      <button class="btn-primary" onclick="tryAdminLogin()">Continue</button>
+      <div style="text-align:center; margin-top:18px;">
+        <button class="text-link" onclick="backToLogin()">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div class="card hidden stage wide" id="adminScreen">
+    <div class="topbar">
+      <div class="who">Admin Mode</div>
+      <div class="topbar-actions">
+        <button class="text-link" onclick="exitAdmin()">Exit</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabBtnInstructions" onclick="switchTab('instructions')">Instructions</button>
+      <button class="tab-btn" id="tabBtnLog" onclick="switchTab('log')">Access Log</button>
+    </div>
+
+    <div class="card-inner" id="adminInstructionsPane" style="padding-top:20px;">
+      <div class="note-box">
+        This link now works for <b>anyone, without logging in</b>. That means edits here live only in
+        <b>this browser tab</b> — they won't show up for people who already have the link. When you're
+        done editing, click <b>"Download Updated Page"</b> below and re-share that new file wherever
+        you're hosting this link, so everyone sees the changes.
+      </div>
+      <div style="text-align:right; margin-bottom:18px;">
+        <button class="mini-btn" onclick="downloadUpdatedFile()">⬇ Download Updated Page</button>
+      </div>
+      <p class="sub" style="margin-bottom:20px;">Select text inside a point to bold, underline, or recolor it.</p>
+      <div id="adminList"></div>
+      <div class="add-block">
+        <label>Add new instruction</label>
+        <div id="addToolbarSlot"></div>
+        <div id="addEditorSlot"></div>
+        <div class="add-row">
+          <button class="btn-next" style="flex:1;" onclick="addInstruction()">Add</button>
+        </div>
+      </div>
+      <div class="ok-msg" id="adminSaveMsg"></div>
+    </div>
+
+    <div class="card-inner hidden" id="adminLogPane" style="padding-top:20px;">
+      <div class="note-box" id="logConfigNote"></div>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <div class="log-summary" style="margin-bottom:0;"><span id="logCount">0</span> people have accessed the system.</div>
+        <button class="mini-btn" onclick="loadSheetLog()">⟳ Refresh</button>
+      </div>
+      <div id="logList"></div>
+    </div>
+  </div>
+
+  <!-- INSTRUCTIONS VIEWER -->
+  <div class="card hidden" id="mainScreen">
+    <div class="topbar">
+      <div class="who">Signed in as <span id="whoName"></span></div>
+      <button class="text-link" onclick="logout()">Exit</button>
+    </div>
+    <div class="card-inner" style="padding-top:0;">
+      <div class="step-num" id="stepNum">01</div>
+      <div class="step-text gu" id="stepText"></div>
+    </div>
+    <div class="dots" id="dots"></div>
+    <div class="navrow">
+      <button class="btn-ghost" id="backBtn" onclick="prevStep()">Back</button>
+      <button class="btn-next" id="nextBtn" onclick="nextStep()">Next</button>
+    </div>
+  </div>
+
+  <!-- DONE -->
+  <div class="card hidden" id="doneScreen">
+    <div class="card-inner">
+      <div class="done-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0C2622" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h1>All instructions complete</h1>
+      <p class="sub">You've gone through all the instructions. Review them again, or exit whenever you're ready.</p>
+      <div class="done-row">
+        <button class="btn-ghost" onclick="restart()">Review Again</button>
+        <button class="btn-teal" onclick="exitAfterDone()">Exit</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const ADMIN_PASSCODE = 'admin123'; // simple demo passcode — change this string to your own
+  const FONT_CHOICES = ['Hind Vadodara', 'Noto Sans Gujarati', 'Noto Serif Gujarati', 'Inter'];
+
+  // OPTIONAL: to log every visitor centrally (across all devices) without any login,
+  // create a free Google Form with 3 short-answer fields (Name, Mht ID, Email) linked
+  // to a Google Sheet, then fill in the values below. Leave actionUrl blank to disable.
+  const GOOGLE_FORM_CONFIG = {
+    actionUrl: 'https://docs.google.com/forms/d/e/1FAIpQLSc4rFD6Ln8OtLef9AZqa-1wQsbQ-VJdzltpBDozIMRkyiFgCg/formResponse',
+    entryName: 'entry.267089582',
+    entryMhtId: 'entry.1651292685',
+    entryEmail: 'entry.545005358'
+  };
+
+  // Reads the linked Google Sheet back into the Access Log tab so entries from
+  // every visitor/device show up inside the app itself, not just in Google Sheets.
+  // The Sheet must be shared as "Anyone with the link — Viewer" for this to work.
+  const SHEET_CONFIG = {
+    csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR-tHWLZgenokzoZY0Da2l7REBT3gyjxZR6UuC06KrG2gMwitV72Yla045a9oeDkJSEfneA-jvlTW0j/pub?gid=1467648205&single=true&output=csv'
+  };
+
+  const DEFAULT_INSTRUCTIONS = [
+    "રજીસ્ટ્રેશન દર ઇવેન્ટની જેમ જ કરવાનું છે.",
+    "બ્લેન્ક રજીસ્ટ્રેશન QR Code થી થઇ જશે સ્માર્ટ ફોન ન હોય તો કરી આપવાનું રહેશે.",
+    "સૌ પ્રથમ ઉતારો આપતા પહેલા રીમાર્ક પ્રમાણે જ ઉતારો આપવો..... ન હોય તો એડમીન ને પૂછીને આપવો....",
+    "AC / NAC Sharing / Economy રીમાર્ક હોય તેમને સ્ટોપ એન્ડ સ્ટે મોકલવા.",
+    "પાર્સલ જોઈતું હોય તેને પાસ (દાદાનગરથી મળશે) જે માટે સિસ્ટમમાં પાર્સલ ટિક કરી પાસ આપવો.",
+    "*છેલ્લા દિવસનો ઉતારો પુછીને આપવો.",
+    "સેવાથીને Dormitory અને પાર્સલ લેશે તો ચાર્જ લાગશે."
+  ];
+
+  let instructions = DEFAULT_INSTRUCTIONS.slice();
+  let accessLog = [];
+  let current = 0;
+  let currentUser = { name: "", mhtId: "", email: "" };
+  const savedRanges = {};
+
+  function show(id){
+    ['loginScreen','adminGateScreen','adminScreen','mainScreen','doneScreen']
+      .forEach(s => document.getElementById(s).classList.toggle('hidden', s !== id));
+  }
+
+  // ---------- login ----------
+  function tryLogin(){
+    const name = document.getElementById('nameInput').value.trim();
+    const mhtId = document.getElementById('mhtInput').value.trim();
+    const email = document.getElementById('emailInput').value.trim();
+    const errEl = document.getElementById('errMsg');
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if(!name){ errEl.textContent = "Please enter your name."; return; }
+    if(!mhtId){ errEl.textContent = "Please enter your Mht ID."; return; }
+    if(!emailPattern.test(email)){ errEl.textContent = "Please enter a valid email address."; return; }
+
+    errEl.textContent = "";
+    currentUser = { name, mhtId, email };
+    document.getElementById('whoName').textContent = name;
+
+    const entry = { name, mhtId, email, time: new Date().toISOString() };
+    accessLog.unshift(entry);
+    logAccessExternally(entry);
+
+    current = 0;
+    show('mainScreen');
+    renderViewer();
+  }
+
+  function logAccessExternally(entry){
+    if(!GOOGLE_FORM_CONFIG.actionUrl) return;
+    try{
+      let iframe = document.getElementById('hiddenFormFrame');
+      if(!iframe){
+        iframe = document.createElement('iframe');
+        iframe.name = 'hiddenFormFrame';
+        iframe.id = 'hiddenFormFrame';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+      const form = document.createElement('form');
+      form.action = GOOGLE_FORM_CONFIG.actionUrl;
+      form.method = 'POST';
+      form.target = 'hiddenFormFrame';
+
+      const addField = (name, value) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      };
+      addField(GOOGLE_FORM_CONFIG.entryName, entry.name);
+      addField(GOOGLE_FORM_CONFIG.entryMhtId, entry.mhtId);
+      addField(GOOGLE_FORM_CONFIG.entryEmail, entry.email);
+
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+    } catch(e){ console.error('External log failed', e); }
+  }
+
+  function logout(){
+    document.getElementById('nameInput').value = "";
+    document.getElementById('mhtInput').value = "";
+    document.getElementById('emailInput').value = "";
+    document.getElementById('errMsg').textContent = "";
+    currentUser = { name:"", mhtId:"", email:"" };
+    show('loginScreen');
+  }
+
+  function exitAfterDone(){ logout(); }
+
+  function backToLogin(){
+    document.getElementById('adminErr').textContent = "";
+    document.getElementById('adminPass').value = "";
+    show('loginScreen');
+  }
+
+  // ---------- admin ----------
+  function showAdminGate(){ show('adminGateScreen'); }
+
+  function tryAdminLogin(){
+    const val = document.getElementById('adminPass').value;
+    const errEl = document.getElementById('adminErr');
+    if(val !== ADMIN_PASSCODE){ errEl.textContent = "Incorrect passcode."; return; }
+    errEl.textContent = "";
+    document.getElementById('adminPass').value = "";
+    switchTab('instructions');
+    show('adminScreen');
+    renderAdmin();
+  }
+
+  function exitAdmin(){ show('loginScreen'); }
+
+  function switchTab(tab){
+    const isInstr = tab === 'instructions';
+    document.getElementById('tabBtnInstructions').classList.toggle('active', isInstr);
+    document.getElementById('tabBtnLog').classList.toggle('active', !isInstr);
+    document.getElementById('adminInstructionsPane').classList.toggle('hidden', !isInstr);
+    document.getElementById('adminLogPane').classList.toggle('hidden', isInstr);
+    if(!isInstr) loadSheetLog();
+  }
+
+  function parseCSV(text){
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for(let i = 0; i < text.length; i++){
+      const c = text[i];
+      if(inQuotes){
+        if(c === '"'){
+          if(text[i+1] === '"'){ field += '"'; i++; }
+          else inQuotes = false;
+        } else field += c;
+      } else {
+        if(c === '"') inQuotes = true;
+        else if(c === ','){ row.push(field); field = ''; }
+        else if(c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
+        else if(c === '\r'){ /* skip */ }
+        else field += c;
+      }
+    }
+    if(field.length || row.length){ row.push(field); rows.push(row); }
+    return rows.filter(r => r.some(v => v.trim() !== ''));
+  }
+
+  async function loadSheetLog(){
+    const noteEl = document.getElementById('logConfigNote');
+    const listEl = document.getElementById('logList');
+    if(!SHEET_CONFIG.csvUrl){
+      noteEl.innerHTML = "No Sheet connected yet.";
+      return;
+    }
+    noteEl.innerHTML = "Loading entries from your Google Sheet...";
+    try{
+      const res = await fetch(SHEET_CONFIG.csvUrl);
+      const text = await res.text();
+      if(!res.ok || text.trim().startsWith('<')){
+        throw new Error('Sheet not publicly readable');
+      }
+      const rows = parseCSV(text);
+      const dataRows = rows.slice(1); // drop header row (Timestamp, Name, Mht ID, Email)
+      accessLog = dataRows.map(r => ({
+        time: r[0] || '',
+        name: r[1] || '',
+        mhtId: r[2] || '',
+        email: r[3] || ''
+      })).reverse();
+      noteEl.innerHTML = "Showing live entries from your connected Google Sheet — every visitor, every device.";
+      renderLog();
+    } catch(e){
+      console.error('Could not load sheet', e);
+      noteEl.innerHTML = "Couldn't load the Sheet. Open it in Google Sheets → <b>Share</b> → set access to <b>\"Anyone with the link — Viewer\"</b>, then hit Refresh.";
+      renderLog();
+    }
+  }
+
+  // ---------- rich text helpers ----------
+  function fontOptionsHTML(){
+    return FONT_CHOICES.map(f => `<option value="${f}">${f}</option>`).join('');
+  }
+
+  function toolbarHTML(targetId){
+    return `
+      <div class="toolbar">
+        <button type="button" class="tbtn" title="Bold" onmousedown="event.preventDefault()" onclick="applyBold('${targetId}')"><b>B</b></button>
+        <button type="button" class="tbtn u" title="Underline" onmousedown="event.preventDefault()" onclick="applyUnderline('${targetId}')">U</button>
+        <select class="tsel" title="Font" onmousedown="event.preventDefault()" onchange="applyFont('${targetId}', this.value)">
+          <option value="">Font...</option>
+          ${fontOptionsHTML()}
+        </select>
+        <input type="color" class="tcolor" title="Text color" value="#ffffff" onmousedown="event.preventDefault()" onchange="applyColor('${targetId}', this.value)">
+        <button type="button" class="tbtn" title="Clear formatting" onmousedown="event.preventDefault()" onclick="applyClear('${targetId}')" style="font-size:11px;">Aa</button>
+      </div>
+    `;
+  }
+
+  function saveSelection(id){
+    const sel = window.getSelection();
+    if(sel.rangeCount > 0){
+      const range = sel.getRangeAt(0);
+      const el = document.getElementById(id);
+      if(el && el.contains(range.commonAncestorContainer)){
+        savedRanges[id] = range.cloneRange();
+      }
+    }
+  }
+
+  function restoreSelection(id){
+    const range = savedRanges[id];
+    const el = document.getElementById(id);
+    if(el) el.focus();
+    if(range){
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+  }
+
+  function applyBold(id){ restoreSelection(id); document.execCommand('bold'); saveSelection(id); }
+  function applyUnderline(id){ restoreSelection(id); document.execCommand('underline'); saveSelection(id); }
+  function applyFont(id, font){ if(!font) return; restoreSelection(id); document.execCommand('fontName', false, font); saveSelection(id); }
+  function applyColor(id, color){ restoreSelection(id); document.execCommand('foreColor', false, color); saveSelection(id); }
+  function applyClear(id){ restoreSelection(id); document.execCommand('removeFormat'); saveSelection(id); }
+
+  function attachSelectionTracking(id){
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('mouseup', () => saveSelection(id));
+    el.addEventListener('keyup', () => saveSelection(id));
+  }
+
+  function sanitizeHTML(html){
+    const allowedTags = ['B','STRONG','U','SPAN','FONT','BR','DIV','EM','I'];
+    const allowedAttrs = { SPAN:['style'], FONT:['color','face'] };
+    const temp = document.createElement('div');
+    temp.innerHTML = html;
+    (function clean(node){
+      [...node.childNodes].forEach(child => {
+        if(child.nodeType === 1){
+          if(!allowedTags.includes(child.tagName)){
+            while(child.firstChild) node.insertBefore(child.firstChild, child);
+            node.removeChild(child);
+            return;
+          }
+          const allowed = allowedAttrs[child.tagName] || [];
+          [...child.attributes].forEach(attr => {
+            if(!allowed.includes(attr.name)) child.removeAttribute(attr.name);
+          });
+          if(child.hasAttribute('style')){
+            const style = child.getAttribute('style');
+            const safeParts = style.split(';').map(s => s.trim()).filter(s =>
+              /^color\s*:/i.test(s) || /^font-family\s*:/i.test(s)
+            );
+            if(safeParts.length) child.setAttribute('style', safeParts.join('; '));
+            else child.removeAttribute('style');
+          }
+          clean(child);
+        } else if(child.nodeType !== 3){
+          node.removeChild(child);
+        }
+      });
+    })(temp);
+    return temp.innerHTML;
+  }
+
+  // ---------- admin: instructions ----------
+  function renderAdmin(){
+    const listEl = document.getElementById('adminList');
+    listEl.innerHTML = "";
+    instructions.forEach((html, i) => {
+      const editId = 'edit-' + i;
+      const item = document.createElement('div');
+      item.className = 'admin-item';
+      item.innerHTML = `
+        <div class="admin-item-top">
+          <div class="admin-item-num">${i+1}</div>
+          <div class="admin-item-body">
+            ${toolbarHTML(editId)}
+            <div class="rich-edit gu" id="${editId}" contenteditable="true">${html}</div>
+          </div>
+        </div>
+        <div class="admin-item-actions">
+          <button class="mini-btn" onclick="saveEdit(${i})">Save</button>
+          <button class="mini-btn" onclick="moveItem(${i},-1)" ${i===0?'disabled':''}>Up</button>
+          <button class="mini-btn" onclick="moveItem(${i},1)" ${i===instructions.length-1?'disabled':''}>Down</button>
+          <button class="mini-btn danger" onclick="deleteInstruction(${i})">Remove</button>
+        </div>
+      `;
+      listEl.appendChild(item);
+      attachSelectionTracking(editId);
+    });
+
+    document.getElementById('addToolbarSlot').innerHTML = toolbarHTML('newInstruction');
+    document.getElementById('addEditorSlot').innerHTML = `<div class="rich-edit gu" id="newInstruction" contenteditable="true"></div>`;
+    attachSelectionTracking('newInstruction');
+  }
+
+  function renderLog(){
+    document.getElementById('logCount').textContent = accessLog.length;
+    const listEl = document.getElementById('logList');
+    if(accessLog.length === 0){
+      listEl.innerHTML = '<div class="log-empty">No entries found yet.</div>';
+      return;
+    }
+    let html = `<div class="log-row head"><div>Name</div><div>Mht ID</div><div>Email</div><div>Time</div></div>`;
+    accessLog.forEach(entry => {
+      const t = new Date(entry.time);
+      const timeStr = isNaN(t) ? entry.time : t.toLocaleString();
+      html += `<div class="log-row">
+        <div>${escapeHtml(entry.name)}</div>
+        <div>${escapeHtml(entry.mhtId)}</div>
+        <div>${escapeHtml(entry.email)}</div>
+        <div>${timeStr}</div>
+      </div>`;
+    });
+    listEl.innerHTML = html;
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function flashSaveMsg(ok){
+    const el = document.getElementById('adminSaveMsg');
+    el.style.color = ok ? 'var(--ok)' : 'var(--danger)';
+    el.textContent = ok ? 'Updated in this tab. Remember to download & re-share when done.' : 'Something went wrong.';
+    setTimeout(() => { el.textContent = ""; }, 3000);
+  }
+
+  function saveEdit(i){
+    const el = document.getElementById('edit-'+i);
+    const clean = sanitizeHTML(el.innerHTML);
+    if(!el.textContent.trim()) return;
+    instructions[i] = clean;
+    flashSaveMsg(true);
+    renderAdmin();
+  }
+
+  function deleteInstruction(i){
+    if(!confirm('Remove this instruction?')) return;
+    instructions.splice(i, 1);
+    flashSaveMsg(true);
+    renderAdmin();
+  }
+
+  function moveItem(i, dir){
+    const j = i + dir;
+    if(j < 0 || j >= instructions.length) return;
+    [instructions[i], instructions[j]] = [instructions[j], instructions[i]];
+    flashSaveMsg(true);
+    renderAdmin();
+  }
+
+  function addInstruction(){
+    const el = document.getElementById('newInstruction');
+    if(!el.textContent.trim()) return;
+    const clean = sanitizeHTML(el.innerHTML);
+    instructions.push(clean);
+    flashSaveMsg(true);
+    renderAdmin();
+  }
+
+  function downloadUpdatedFile(){
+    try{
+      const newArrText = 'const DEFAULT_INSTRUCTIONS = ' + JSON.stringify(instructions, null, 2) + ';';
+      const docClone = document.cloneNode(true);
+
+      const scripts = docClone.querySelectorAll('script');
+      scripts.forEach(s => {
+        if(s.textContent.includes('const DEFAULT_INSTRUCTIONS')){
+          s.textContent = s.textContent.replace(/const DEFAULT_INSTRUCTIONS = \[[\s\S]*?\];/, newArrText);
+        }
+      });
+
+      ['loginScreen','adminGateScreen','adminScreen','mainScreen','doneScreen'].forEach(id => {
+        const el = docClone.getElementById(id);
+        if(el) el.classList.toggle('hidden', id !== 'loginScreen');
+      });
+      ['adminList','addToolbarSlot','addEditorSlot','logList'].forEach(id => {
+        const el = docClone.getElementById(id);
+        if(el) el.innerHTML = '';
+      });
+      ['nameInput','mhtInput','emailInput','adminPass'].forEach(id => {
+        const el = docClone.getElementById(id);
+        if(el) el.removeAttribute('value');
+      });
+
+      const html = '<!DOCTYPE html>\n' + docClone.documentElement.outerHTML;
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'instruction-portal-updated.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch(e){
+      console.error('Download failed', e);
+      alert('Could not generate the file. Please try again.');
+    }
+  }
+
+  // ---------- viewer ----------
+  function buildDots(){
+    const dotsEl = document.getElementById('dots');
+    dotsEl.innerHTML = "";
+    instructions.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'dot';
+      d.id = 'dot' + i;
+      dotsEl.appendChild(d);
+    });
+  }
+
+  function renderViewer(){
+    if(instructions.length === 0){
+      document.getElementById('stepNum').textContent = "";
+      document.getElementById('stepText').textContent = "No instructions available right now.";
+      document.getElementById('dots').innerHTML = "";
+      document.getElementById('backBtn').disabled = true;
+      document.getElementById('nextBtn').disabled = true;
+      return;
+    }
+    document.getElementById('nextBtn').disabled = false;
+    if(current >= instructions.length) current = instructions.length - 1;
+    buildDots();
+    document.getElementById('stepNum').textContent = String(current + 1).padStart(2,'0');
+    document.getElementById('stepText').innerHTML = instructions[current];
+    document.getElementById('backBtn').disabled = current === 0;
+    document.getElementById('nextBtn').textContent = (current === instructions.length - 1) ? "Finish" : "Next";
+
+    for(let i=0; i<instructions.length; i++){
+      const dot = document.getElementById('dot'+i);
+      dot.classList.remove('active','done');
+      if(i < current) dot.classList.add('done');
+      else if(i === current) dot.classList.add('active');
+    }
+  }
+
+  function nextStep(){
+    if(current < instructions.length - 1){
+      current++;
+      renderViewer();
+    } else {
+      show('doneScreen');
+    }
+  }
+
+  function prevStep(){
+    if(current > 0){
+      current--;
+      renderViewer();
+    }
+  }
+
+  function restart(){
+    current = 0;
+    show('mainScreen');
+    renderViewer();
+  }
+</script>
+
+</body>
+</html>
